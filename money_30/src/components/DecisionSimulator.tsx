@@ -4,17 +4,23 @@ import type {
   FinancialState,
   DecisionType,
   DecisionInput,
+  FinancialDecision,
+  SimulationResult,
 } from "../types/financial";
 import {
   DECISION_PRESETS,
   getSimulationResult,
   calculateDerivedMetrics,
-} from "../state/financialState";
+  calculateRemainingBalance,
+} from "../lib/financialEngine";
+import { PRODUCT } from "../config/product";
 
 interface Props {
   currentState: FinancialState;
   onApplyDecision: (newState: FinancialState, decision?: DecisionInput) => void;
   onResetBaseline: () => void;
+  /** Explicit optional handler for discard simulation */
+  onDiscardDecision?: () => void;
 }
 
 export default function DecisionSimulator({
