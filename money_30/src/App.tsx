@@ -75,19 +75,24 @@ export default function App() {
     const canvas = canvasRef.current!;
     const ctx = canvas.getContext("2d")!;
 
+    let lastDrawnFrame = -1;
+
     function resizeCanvas() {
       canvas.width = window.innerWidth;
       canvas.height = window.innerHeight;
+      lastDrawnFrame = -1; // force redraw on resize
+      drawFrame();
     }
 
     function drawFrame() {
-      const img = imagesRef.current[currentFrameRef.current];
+      const frameIdx = currentFrameRef.current;
+      const img = imagesRef.current[frameIdx];
       if (!img) return;
 
       const cw = canvas.width;
       const ch = canvas.height;
-      const iw = img.naturalWidth;
-      const ih = img.naturalHeight;
+      const iw = img.naturalWidth || 1920;
+      const ih = img.naturalHeight || 1080;
 
       // Cover-fit: fill viewport while preserving 16:9 aspect ratio
       const scale = Math.max(cw / iw, ch / ih);
@@ -98,6 +103,7 @@ export default function App() {
 
       ctx.clearRect(0, 0, cw, ch);
       ctx.drawImage(img, dx, dy, dw, dh);
+      lastDrawnFrame = frameIdx;
     }
 
     function onScroll() {
@@ -146,16 +152,19 @@ export default function App() {
     }
 
     function tick() {
-      drawFrame();
+      if (currentFrameRef.current !== lastDrawnFrame) {
+        drawFrame();
+      }
       rafRef.current = requestAnimationFrame(tick);
     }
 
     resizeCanvas();
-    window.addEventListener("resize", resizeCanvas);
+    window.addEventListener("resize", resizeCanvas, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
 
     // Set initial frame
     onScroll();
+    drawFrame();
     rafRef.current = requestAnimationFrame(tick);
 
     return () => {
