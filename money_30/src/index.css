@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+/* ── Typography & theme setup ───────────────────────────────────────── */
+@theme {
+  --font-display: "Anton", "Space Grotesk", sans-serif;
+  --font-heading: "Space Grotesk", sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --font-sans: "Space Grotesk", sans-serif;
+}
+
+.font-display {
+  font-family: "Anton", "Space Grotesk", sans-serif;
+}
+
+.font-heading {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+.font-mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* ── Base resets ───────────────────────────────────────────────────── */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background: #000;
+  overflow-x: hidden;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  font-family: "Space Grotesk", -apple-system, sans-serif;
+  background-color: #000;
+  color: #fff;
+}
+
+/* ── Cinematic Vignette & Edge Shadows ─────────────────────────────── */
+
+/*
+ * Subtle vignette that provides gentle edge framing
+ * while keeping the gold coins bright and clear.
+ */
+.vignette-edges {
+  background:
+    radial-gradient(
+      ellipse 90% 80% at 50% 50%,
+      rgba(0, 0, 0, 0) 30%,
+      rgba(0, 0, 0, 0.18) 65%,
+      rgba(0, 0, 0, 0.45) 88%,
+      rgba(0, 0, 0, 0.70) 100%
+    ),
+    /* Subtle top gradient for header typography readability */
+    linear-gradient(180deg, rgba(0, 0, 0, 0.50) 0%, rgba(0, 0, 0, 0.15) 18%, transparent 35%),
+    /* Subtle bottom gradient for footer indicator readability */
+    linear-gradient(0deg, rgba(0, 0, 0, 0.55) 0%, rgba(0, 0, 0, 0.18) 20%, transparent 40%);
+  pointer-events: none;
+}
+
+/*
+ * Watermark mitigation gradient for bottom-right corner.
+ * Naturally darkens the corner to obscure source artifacts.
+ */
+.vignette-corner-watermark {
+  background: radial-gradient(
+    circle at 98% 96%,
+    rgba(0, 0, 0, 0.95) 0%,
+    rgba(0, 0, 0, 0.7) 140px,
+    transparent 280px
+  );
+  pointer-events: none;
+}
+
+/* Subtle cinematic film texture (pure CSS noise/grain) */
+.film-grain {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 0);
+  background-size: 24px 24px;
+  pointer-events: none;
+}
