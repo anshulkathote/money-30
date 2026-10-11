@@ -120,6 +120,12 @@ export interface CommitmentItem {
   category?: string;
 }
 
+/** Canonical alias for CommitmentItem */
+export type Commitment = CommitmentItem;
+
+/** Canonical alias for DecisionInput */
+export type FinancialDecision = DecisionInput;
+
 export type RiskClassification = "LOW" | "MEDIUM" | "HIGH";
 
 export interface HealthDimension {

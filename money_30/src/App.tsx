@@ -163,7 +163,7 @@ export default function App() {
       window.removeEventListener("resize", resizeCanvas);
       window.removeEventListener("scroll", onScroll);
     };
-  }, [loaded]);
+  }, [loaded, cinematicProgress]);
 
   // ── Preload loader ──────────────────────────────────────────────────
   if (!loaded) {

@@ -423,12 +423,11 @@ export function generateHealthReport(state: FinancialState): HealthReport {
   };
 }
 
-export function calculateDerivedMetrics(state: FinancialState): DerivedMetrics {
-  const remainingBalance = state.budget - state.spent;
-  const availableToAllocate =
-    state.budget - (state.spent + state.commitments + state.savings);
-
-  // Baseline calibration constants (matching Day 7 unperturbed state)
+/**
+ * Calculates remaining discretionary daily allowance across the remaining cycle.
+ * Incorporates net liquid disruptions against calibrated baseline.
+ */
+export function calculateDailyAllowance(state: FinancialState): number {
   const baselineSpent = 2580;
   const baselineCommitments = 2467;
   const baselineSavings = 3000;
@@ -441,11 +440,56 @@ export function calculateDerivedMetrics(state: FinancialState): DerivedMetrics {
     (state.savings - baselineSavings) -
     (state.budget - baselineBudget);
 
-  const dailyAllowance = Math.max(
+  return Math.max(
     0,
     Math.round(247 - netLiquidDisruption / Math.max(1, state.daysRemaining))
   );
-  const monthEndForecast = Math.round(2100 - netLiquidDisruption);
+}
+
+/**
+ * Calculates forecasted liquidity surplus/deficit at Day 30.
+ */
+export function calculateMonthEndForecast(state: FinancialState): number {
+  const baselineSpent = 2580;
+  const baselineCommitments = 2467;
+  const baselineSavings = 3000;
+  const baselineBudget = 10000;
+
+  const netLiquidDisruption =
+    state.spent -
+    baselineSpent +
+    (state.commitments - baselineCommitments) +
+    (state.savings - baselineSavings) -
+    (state.budget - baselineBudget);
+
+  return Math.round(2100 - netLiquidDisruption);
+}
+
+/**
+ * Calculates projected balance at any specific target day in the 30-day timeline.
+ */
+export function calculateProjectedBalance(
+  state: FinancialState,
+  targetDay: number
+): number {
+  const remaining = state.budget - state.spent;
+  const forecast = calculateMonthEndForecast(state);
+  if (targetDay <= state.currentDay) {
+    const elapsedRatio = targetDay / Math.max(1, state.currentDay);
+    return Math.round(state.budget - state.spent * elapsedRatio);
+  }
+  const remainingProgress =
+    (targetDay - state.currentDay) / Math.max(1, state.totalDays - state.currentDay);
+  return Math.round(remaining - (remaining - forecast) * remainingProgress);
+}
+
+export function calculateDerivedMetrics(state: FinancialState): DerivedMetrics {
+  const remainingBalance = state.budget - state.spent;
+  const availableToAllocate =
+    state.budget - (state.spent + state.commitments + state.savings);
+
+  const dailyAllowance = calculateDailyAllowance(state);
+  const monthEndForecast = calculateMonthEndForecast(state);
 
   const riskObj = calculateRisk(state);
   const financialRisk: RiskLevel =
@@ -575,6 +619,20 @@ export function getAffordabilityVerdict(
   };
 }
 
+/**
+ * WHAT IF? DECISION SIMULATOR ENGINE
+ *
+ * Why the simulator recalculates multiple interconnected metrics:
+ * In a finite 30-day budget (₹10,000), a single financial action does not simply reduce balance.
+ * Because all variables are interconnected in real life:
+ * 1. Immediate Liquidity: Checking balance moves instantly.
+ * 2. Daily Runway Rate: Remaining days (23) must absorb the change, altering the safe daily allowance.
+ * 3. Day 30 Trajectory: Month-end forecast compounds daily drift.
+ * 4. Defensive Risk & Health: Composite resilience changes, testing vulnerability to surprise emergencies.
+ *
+ * This function calculates the hypothetical state, evaluates the complete Before vs After delta,
+ * generates an evidence-based Affordability Verdict, and derives a 4-step Consequence Chain.
+ */
 export function getSimulationResult(
   currentState: FinancialState,
   decision: DecisionInput
@@ -972,6 +1030,28 @@ export function useFinancialState() {
     removeCommitment,
     setState,
     applyDecisionState,
+    /** Semantic alias for applyDecisionState */
+    applyDecision: applyDecisionState,
     resetToBaseline,
+    /** Semantic alias for resetToBaseline */
+    resetFinancialState: resetToBaseline,
   };
 }
+
+/**
+ * Pure helper to compute next state from applying a decision.
+ */
+export function applyDecision(
+  currentState: FinancialState,
+  decision: DecisionInput
+): FinancialState {
+  return simulateDecision(currentState, decision);
+}
+
+/**
+ * Pure helper to reset state back to baseline ₹10,000 Day 7 model.
+ */
+export function resetFinancialState(): FinancialState {
+  return { ...INITIAL_FINANCIAL_STATE };
+}
+
