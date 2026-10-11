@@ -23,6 +23,10 @@ export interface DerivedMetrics {
   availablePercentage: number;
 }
 
+/** Canonical alias for DerivedMetrics */
+export type FinancialMetrics = DerivedMetrics;
+
+
 export type EventCategory =
   | "SUBSCRIPTION"
   | "COMMITMENT"

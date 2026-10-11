@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion } from "motion/react";
 import type { FinancialState, DerivedMetrics } from "../types/financial";
+import { PRODUCT } from "../config/product";
 
 interface Props {
   state: FinancialState;
@@ -110,7 +111,7 @@ export default function FinancialPulse({ state, metrics }: Props) {
             className="flex flex-col gap-3 max-w-xs md:text-right font-mono text-xs text-white/50 tracking-wider"
           >
             <p>
-              ₹10,000 initialized for 30 days. Active scrubbing of current liquidity,
+              {PRODUCT.currencySymbol}{PRODUCT.budget.toLocaleString()} initialized for {PRODUCT.durationDays} days. Active scrubbing of current liquidity,
               consequence pipelines, and systemic capital allocation.
             </p>
             <div className="flex items-center md:justify-end gap-2 text-amber-300/90 font-medium text-[11px]">

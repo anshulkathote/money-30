@@ -1,4 +1,5 @@
 import { type MotionValue, motion, useTransform } from "motion/react";
+import { PRODUCT } from "./config/product";
 
 /* ─────────────────────────────────────────────────────────────────────
  * StoryOverlay — Layer 2 (z-20)
@@ -154,7 +155,7 @@ export default function StoryOverlay({ progress }: Props) {
           {/* Dominant Hero Amount */}
           <motion.div style={s1Hero} className="leading-none tracking-tight">
             <h1 className="font-display text-[clamp(5.5rem,15vw,13rem)] leading-[0.88] text-white tracking-tighter drop-shadow-[0_15px_35px_rgba(0,0,0,0.9)]">
-              ₹10,000<span className="text-amber-400">.</span>
+              {PRODUCT.currencySymbol}{PRODUCT.budget.toLocaleString()}<span className="text-amber-400">.</span>
             </h1>
           </motion.div>
 
@@ -345,7 +346,7 @@ export default function StoryOverlay({ progress }: Props) {
             className="mt-6 sm:mt-8 max-w-xl"
           >
             <p className="font-mono text-[clamp(0.9rem,1.5vw,1.25rem)] text-white/70 tracking-wider">
-              30 days. ₹10,000. Every decision has a consequence.
+              {PRODUCT.durationDays} days. {PRODUCT.currencySymbol}{PRODUCT.budget.toLocaleString()}. Every decision has a consequence.
             </p>
           </motion.div>
         </div>
